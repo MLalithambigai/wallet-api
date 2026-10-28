@@ -5,10 +5,13 @@ import { db } from "./config/db.js";
 import rateLimiter from "./middleware/rateLimiter.js";
 
 import transactionRoute from "./routes/transactionRoute.js";
+import job from "./config/cron.js"
 
 dotenv.config();
 
 const app = express();
+
+if (process.env.NODE_ENV === "production") job.start();
 
 app.use(cors());
 app.use(rateLimiter);
@@ -42,6 +45,10 @@ async function initDB() {
 
 app.get("/", (req, res) => {
   res.send("It's working")
+})
+
+app.get("/api/health",(req,res)=>{
+  res.status(200).json({status:"ok"});
 })
 
 app.use("/api/transactions", transactionRoute);
